@@ -5,32 +5,11 @@ import { ChapterEditor } from "@/components/chapter-editor"
 import { Header } from "@/components/header"
 import { TerminologyPanel } from "@/components/terminology-panel"
 import { ProjectConfigPanel } from "@/components/project-config-panel"
-import { useState, useEffect } from "react"
-import { createClient } from "@/lib/supabase/client"
-import { useRouter } from "next/navigation"
+import { useState } from "react"
 
 export default function AppPage() {
   const [currentChapter, setCurrentChapter] = useState(1)
   const [chapterOrder, setChapterOrder] = useState([1, 2, 3, 4, 5])
-  const [isLoading, setIsLoading] = useState(true)
-  const router = useRouter()
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const supabase = createClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-
-      if (!user) {
-        router.push("/")
-      } else {
-        setIsLoading(false)
-      }
-    }
-
-    checkAuth()
-  }, [router])
 
   const handleAddChapter = () => {
     const newChapterNumber = Math.max(...chapterOrder) + 1
@@ -51,14 +30,6 @@ export default function AppPage() {
     } else if (chapterToDelete < currentChapter) {
       setCurrentChapter(currentChapter - 1)
     }
-  }
-
-  if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-background">
-        <div className="text-muted-foreground">Loading...</div>
-      </div>
-    )
   }
 
   return (
