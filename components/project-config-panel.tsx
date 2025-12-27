@@ -578,150 +578,152 @@ export function ProjectConfigPanel() {
       </div>
 
       <Dialog open={advancedOpen} onOpenChange={setAdvancedOpen}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
+        <DialogContent className="max-w-lg max-h-[80vh] flex flex-col">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle className="text-lg font-semibold">Project Context Settings</DialogTitle>
           </DialogHeader>
 
-          <p className="text-sm text-muted-foreground mb-4">
-            Adjust settings to match the needs of your translation project. These preferences guide segmentation and AI
-            behavior.
-          </p>
+          <div className="flex-1 overflow-y-auto pr-2">
+            <p className="text-sm text-muted-foreground mb-4">
+              Adjust settings to match the needs of your translation project. These preferences guide segmentation and
+              AI behavior.
+            </p>
 
-          <div className="space-y-4">
-            {/* Content Type */}
-            <div className="flex items-center justify-between py-3 border-t border-border">
-              <span className="text-sm font-medium">Content Type:</span>
-              <div className="relative w-56">
-                <select
-                  value={advancedConfig.contentType}
-                  onChange={(e) => setAdvancedConfig((prev) => ({ ...prev, contentType: e.target.value }))}
-                  className="w-full h-9 appearance-none rounded border border-border bg-background pl-9 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
-                >
-                  <option value="literary">Literary</option>
-                  <option value="technical">Technical</option>
-                  <option value="legal">Legal</option>
-                  <option value="marketing">Marketing</option>
-                  <option value="software">Software</option>
-                </select>
-                <Book className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <div className="space-y-4">
+              {/* Content Type */}
+              <div className="flex items-center justify-between py-3 border-t border-border">
+                <span className="text-sm font-medium">Content Type:</span>
+                <div className="relative w-56">
+                  <select
+                    value={advancedConfig.contentType}
+                    onChange={(e) => setAdvancedConfig((prev) => ({ ...prev, contentType: e.target.value }))}
+                    className="w-full h-9 appearance-none rounded border border-border bg-background pl-9 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                  >
+                    <option value="literary">Literary</option>
+                    <option value="technical">Technical</option>
+                    <option value="legal">Legal</option>
+                    <option value="marketing">Marketing</option>
+                    <option value="software">Software</option>
+                  </select>
+                  <Book className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                </div>
               </div>
-            </div>
 
-            {/* Editing Mode */}
-            <div className="flex items-center justify-between py-3 border-t border-border">
-              <span className="text-sm font-medium">Editing Mode:</span>
-              <div className="relative w-56">
-                <select
-                  value={advancedConfig.editingMode}
-                  onChange={(e) => setAdvancedConfig((prev) => ({ ...prev, editingMode: e.target.value }))}
-                  className="w-full h-9 appearance-none rounded border border-border bg-background pl-9 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
-                >
-                  <option value="drafting">Drafting</option>
-                  <option value="review">Review</option>
-                  <option value="final">Final</option>
-                </select>
-                <Pencil className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              {/* Editing Mode */}
+              <div className="flex items-center justify-between py-3 border-t border-border">
+                <span className="text-sm font-medium">Editing Mode:</span>
+                <div className="relative w-56">
+                  <select
+                    value={advancedConfig.editingMode}
+                    onChange={(e) => setAdvancedConfig((prev) => ({ ...prev, editingMode: e.target.value }))}
+                    className="w-full h-9 appearance-none rounded border border-border bg-background pl-9 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                  >
+                    <option value="drafting">Drafting</option>
+                    <option value="review">Review</option>
+                    <option value="final">Final</option>
+                  </select>
+                  <Pencil className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                </div>
               </div>
-            </div>
 
-            {/* Segmentation Bias */}
-            <div className="py-3 border-t border-border">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-medium">Segmentation Bias:</span>
-                <span className="text-sm font-semibold">{getSegmentationLabel(advancedConfig.segmentationBias)}</span>
+              {/* Segmentation Bias */}
+              <div className="py-3 border-t border-border">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-medium">Segmentation Bias:</span>
+                  <span className="text-sm font-semibold">{getSegmentationLabel(advancedConfig.segmentationBias)}</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-muted-foreground">Coarse</span>
+                  <Slider
+                    value={[advancedConfig.segmentationBias]}
+                    onValueChange={(v) => setAdvancedConfig((prev) => ({ ...prev, segmentationBias: v[0] }))}
+                    max={100}
+                    step={1}
+                    className="flex-1"
+                  />
+                  <span className="text-xs text-muted-foreground">Fine</span>
+                </div>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="text-xs text-muted-foreground">Coarse</span>
-                <Slider
-                  value={[advancedConfig.segmentationBias]}
-                  onValueChange={(v) => setAdvancedConfig((prev) => ({ ...prev, segmentationBias: v[0] }))}
-                  max={100}
-                  step={1}
-                  className="flex-1"
-                />
-                <span className="text-xs text-muted-foreground">Fine</span>
-              </div>
-            </div>
 
-            {/* TM Priority */}
-            <div className="flex items-center justify-between py-3 border-t border-border">
-              <span className="text-sm font-medium">TM Priority:</span>
-              <div className="relative w-56">
-                <select
-                  value={advancedConfig.tmPriority}
-                  onChange={(e) => setAdvancedConfig((prev) => ({ ...prev, tmPriority: e.target.value }))}
-                  className="w-full h-9 appearance-none rounded border border-border bg-background pl-9 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
-                >
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                </select>
-                <Database className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              {/* TM Priority */}
+              <div className="flex items-center justify-between py-3 border-t border-border">
+                <span className="text-sm font-medium">TM Priority:</span>
+                <div className="relative w-56">
+                  <select
+                    value={advancedConfig.tmPriority}
+                    onChange={(e) => setAdvancedConfig((prev) => ({ ...prev, tmPriority: e.target.value }))}
+                    className="w-full h-9 appearance-none rounded border border-border bg-background pl-9 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                  >
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                  </select>
+                  <Database className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                </div>
               </div>
-            </div>
 
-            {/* AI Latitude */}
-            <div className="flex items-center justify-between py-3 border-t border-border">
-              <span className="text-sm font-medium">AI Latitude:</span>
-              <div className="relative w-56">
-                <select
-                  value={advancedConfig.aiLatitude}
-                  onChange={(e) => setAdvancedConfig((prev) => ({ ...prev, aiLatitude: e.target.value }))}
-                  className="w-full h-9 appearance-none rounded border border-border bg-background pl-9 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
-                >
-                  <option value="strict">Strict</option>
-                  <option value="guided">Guided</option>
-                  <option value="creative">Creative</option>
-                </select>
-                <Star className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              {/* AI Latitude */}
+              <div className="flex items-center justify-between py-3 border-t border-border">
+                <span className="text-sm font-medium">AI Latitude:</span>
+                <div className="relative w-56">
+                  <select
+                    value={advancedConfig.aiLatitude}
+                    onChange={(e) => setAdvancedConfig((prev) => ({ ...prev, aiLatitude: e.target.value }))}
+                    className="w-full h-9 appearance-none rounded border border-border bg-background pl-9 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                  >
+                    <option value="strict">Strict</option>
+                    <option value="guided">Guided</option>
+                    <option value="creative">Creative</option>
+                  </select>
+                  <Star className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                </div>
               </div>
-            </div>
 
-            {/* Recommendation Box */}
-            <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-              <div className="flex items-start gap-2">
-                <Info className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="text-sm text-blue-800 dark:text-blue-200">
-                    <span className="font-semibold">Recommended:</span> Paragraph-level segmentation is suitable for
-                    Literary Drafting projects. Switch to Paragraph Mode?
-                  </p>
-                  <div className="flex gap-2 mt-3">
-                    <Button size="sm" className="h-8">
-                      Switch to Paragraph Mode
-                    </Button>
-                    <Button variant="outline" size="sm" className="h-8 bg-transparent">
-                      Keep Current
-                    </Button>
+              {/* Recommendation Box */}
+              <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                <div className="flex items-start gap-2">
+                  <Info className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-sm text-blue-800 dark:text-blue-200">
+                      <span className="font-semibold">Recommended:</span> Paragraph-level segmentation is suitable for
+                      Literary Drafting projects. Switch to Paragraph Mode?
+                    </p>
+                    <div className="flex gap-2 mt-3">
+                      <Button size="sm" className="h-8">
+                        Switch to Paragraph Mode
+                      </Button>
+                      <Button variant="outline" size="sm" className="h-8 bg-transparent">
+                        Keep Current
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Segmentation Preview */}
-            <div className="border border-border rounded-lg p-4 bg-muted/30">
-              <h4 className="text-sm font-medium mb-3">Segmentation Preview:</h4>
-              <div className="space-y-2">
-                {sampleSegments.map((segment, index) => (
-                  <div key={index} className="flex items-start gap-2 bg-background rounded p-2">
-                    <span className="text-xs font-mono bg-primary/10 text-primary px-1.5 py-0.5 rounded flex-shrink-0">
-                      [{index + 1}]
-                    </span>
-                    <span className="text-sm">{segment}</span>
-                  </div>
-                ))}
+              {/* Segmentation Preview */}
+              <div className="border border-border rounded-lg p-4 bg-muted/30">
+                <h4 className="text-sm font-medium mb-3">Segmentation Preview:</h4>
+                <div className="space-y-2">
+                  {sampleSegments.map((segment, idx) => (
+                    <div key={idx} className="flex gap-2 text-sm">
+                      <span className="flex-shrink-0 text-xs font-mono text-primary border border-primary rounded px-1">
+                        [{idx + 1}]
+                      </span>
+                      <span className="text-foreground">{segment}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
 
           {/* Dialog Footer */}
-          <div className="flex justify-end gap-2 mt-4 pt-4 border-t border-border">
-            <Button onClick={() => setAdvancedOpen(false)}>Apply Settings</Button>
+          <div className="flex justify-end gap-2 pt-4 border-t border-border flex-shrink-0">
+            <Button className="bg-primary text-primary-foreground hover:bg-primary/90">Apply Settings</Button>
             <Button variant="outline" onClick={() => setAdvancedOpen(false)}>
               Cancel
             </Button>
