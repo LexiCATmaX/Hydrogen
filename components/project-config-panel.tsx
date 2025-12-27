@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { ChevronDown } from "lucide-react"
+import { Switch } from "@/components/ui/switch"
 
 type DocumentType = "general" | "novel" | "legal" | "technical" | "marketing" | "software" | "academic"
 
@@ -101,19 +102,7 @@ function Toggle({
   return (
     <label className="flex items-center gap-2 cursor-pointer" title={tooltip}>
       <span className="text-xs text-muted-foreground whitespace-nowrap">{label}</span>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={checked}
-        onClick={() => onChange(!checked)}
-        className={`relative h-5 w-9 rounded-full transition-colors ${checked ? "bg-primary" : "bg-muted"}`}
-      >
-        <span
-          className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${
-            checked ? "translate-x-4" : "translate-x-0.5"
-          }`}
-        />
-      </button>
+      <Switch checked={checked} onCheckedChange={onChange} />
     </label>
   )
 }
