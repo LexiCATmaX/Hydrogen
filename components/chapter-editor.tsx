@@ -50,9 +50,7 @@ Und hat mich geschickt, dich um eine Gunst zu bitten!"`,
     english: `Then the fish came swimming to him, and said, 'Well, what is her will? What does your wife want?' 'Ah!' said the fisherman, 'she says that when I had caught you, I ought to have asked you for something before I let you go; she does not like living any longer in the pigsty, and wants a snug little cottage.' 'Go home, then,' said the fish; 'she is in the cottage already.'
 
 So the man went home, and saw his wife standing at the door of a nice trim little cottage. 'Come in, come in!' said she; 'is not this much better than the filthy pigsty we had?' And there was a parlour, and a bedchamber, and a kitchen; and behind the cottage there was a little garden, planted with all sorts of flowers and fruits; and there was a courtyard behind, full of ducks and chickens.`,
-    german: `Dann kam der Fisch zu ihm geschwommen und sagte: „Nun, was ist ihr Wille? Was will deine Frau?" „Ach!" sagte der Fischer, „sie sagt, als ich dich gefangen hatte, hätte ich dich um etwas bitten sollen, bevor ich dich gehen ließ; sie mag es nicht mehr, im Schweinestall zu leben, und will ein gemütliches kleines Häuschen." „Geh dann nach Hause," sagte der Fisch; „sie ist schon im Häuschen."
-
-So ging der Mann nach Hause und sah seine Frau an der Tür eines netten, ordentlichen kleinen Häuschens stehen. „Komm herein, komm herein!" sagte sie; „ist das nicht viel besser als der schmutzige Schweinestall, den wir hatten?" Und da war ein Wohnzimmer und ein Schlafzimmer und eine Küche; und hinter dem Häuschen war ein kleiner Garten, bepflanzt mit allerlei Blumen und Früchten; und dahinter war ein Hof voller Enten und Hühner.`,
+    german: `Dann kam der Fisch zu ihm geschwommen und sagte: „Nun, was ist ihr Wille? Was will deine Frau?" „Ach!" sagte der Fischer, „sie sagt, als ich dich gefangen hatte, hätte ich dich um etwas bitten sollen, bevor ich dich gehen ließ; sie mag es nicht mehr, im Schweinestall zu leben, und will ein gemütliches kleines Häuschen." „Geh dann nach Hause," sagte der Fisch; „sie steht schon im Häuschen."`,
   },
   4: {
     title: "Chapter 4",
@@ -169,8 +167,6 @@ export function ChapterEditor({ chapterId }: ChapterEditorProps) {
 
   const englishRef = useRef<HTMLTextAreaElement>(null)
   const germanRef = useRef<HTMLTextAreaElement>(null)
-  const [englishScroll, setEnglishScroll] = useState(0)
-  const [germanScroll, setGermanScroll] = useState(0)
 
   const englishParagraphs = englishText.split("\n\n")
   const germanParagraphs = germanText.split("\n\n")
@@ -182,78 +178,112 @@ export function ChapterEditor({ chapterId }: ChapterEditorProps) {
     setSelectedParagraph(null)
   }, [chapterId])
 
-  const getParagraphIndex = (position: number, paragraphs: string[]): number => {
-    let charCount = 0
-    for (let i = 0; i < paragraphs.length; i++) {
-      charCount += paragraphs[i].length + 2
-      if (position < charCount) return i
+  const handlePaneClick = (e: React.MouseEvent) => {
+    if (e.button === 0) {
+      // Left click only
+      setSelectedParagraph(null)
     }
-    return paragraphs.length - 1
-  }
-
-  const selectParagraph = (textarea: HTMLTextAreaElement, index: number, paragraphs: string[]) => {
-    let start = 0
-    for (let i = 0; i < index; i++) {
-      start += paragraphs[i].length + 2
-    }
-    const end = start + paragraphs[index].length
-    textarea.setSelectionRange(start, end)
-    textarea.focus()
   }
 
   const handleDoubleClick = (e: React.MouseEvent<HTMLTextAreaElement>, panel: "english" | "german") => {
     const textarea = e.currentTarget
     const paragraphs = panel === "english" ? englishParagraphs : germanParagraphs
-    const index = getParagraphIndex(textarea.selectionStart, paragraphs)
 
-    setSelectedParagraph({ index, panel })
-    setTimeout(() => selectParagraph(textarea, index, paragraphs), 0)
+    // Find which paragraph was clicked
+    let charCount = 0
+    for (let i = 0; i < paragraphs.length; i++) {
+      const paragraphLength = paragraphs[i].length + 2 // +2 for \n\n
+      if (textarea.selectionStart < charCount + paragraphLength) {
+        setSelectedParagraph({ index: i, panel })
+        return
+      }
+      charCount += paragraphLength
+    }
   }
 
   const handleContextMenu = (e: React.MouseEvent<HTMLTextAreaElement>, panel: "english" | "german") => {
     e.preventDefault()
+    e.stopPropagation()
 
     const textarea = e.currentTarget
-    const { selectionStart, selectionEnd, value } = textarea
-
-    if (selectionStart === selectionEnd) return
-
-    const selectedText = value.substring(selectionStart, selectionEnd).trim()
+    const { selectionStart, selectionEnd } = textarea
     const paragraphs = panel === "english" ? englishParagraphs : germanParagraphs
-    const isFullParagraph = paragraphs.some((p) => p.trim() === selectedText)
 
-    setContextMenu({
-      x: e.clientX,
-      y: e.clientY,
-      type: isFullParagraph ? "paragraph" : "partial",
-      panel,
-    })
+    // Find which paragraph was right-clicked
+    let charCount = 0
+    let clickedIndex = 0
+    for (let i = 0; i < paragraphs.length; i++) {
+      const paragraphLength = paragraphs[i].length + 2
+      if (selectionStart < charCount + paragraphLength) {
+        clickedIndex = i
+        break
+      }
+      charCount += paragraphLength
+    }
+
+    // If clicking on the selected paragraph (in either pane), show paragraph menu
+    if (selectedParagraph !== null && clickedIndex === selectedParagraph.index) {
+      setContextMenu({
+        x: e.clientX,
+        y: e.clientY,
+        type: "paragraph",
+        panel,
+      })
+      return
+    }
+
+    // Otherwise check if there's a selection
+    if (selectionStart !== selectionEnd) {
+      const selectedText = textarea.value.substring(selectionStart, selectionEnd).trim()
+      const isFullParagraph = paragraphs.some((p) => p.trim() === selectedText)
+
+      if (isFullParagraph) {
+        setSelectedParagraph({ index: clickedIndex, panel })
+      }
+
+      setContextMenu({
+        x: e.clientX,
+        y: e.clientY,
+        type: isFullParagraph ? "paragraph" : "partial",
+        panel,
+      })
+    }
+  }
+
+  const handleMenuClose = () => {
+    setContextMenu(null)
   }
 
   const handleMenuAction = (action: string) => {
     console.log("Menu action:", action)
-    setContextMenu(null)
-  }
-
-  const getHighlightText = (paragraphs: string[], selectedIndex: number) => {
-    return paragraphs.map((p, i) => (
-      <span key={i}>
-        {i === selectedIndex ? <mark className="bg-blue-200">{p}</mark> : p}
-        {i < paragraphs.length - 1 && "\n\n"}
-      </span>
-    ))
+    handleMenuClose()
   }
 
   const getMenuItems = (type: "paragraph" | "partial", panel: "english" | "german") => {
     const items = type === "paragraph" ? paragraphMenuItems : partialMenuItems
     if (panel === "english" && isSourceLocked) {
       return items.map((item) => {
-        if (item.divider) return item
-        if (item.action === "add-term") return item // Always enabled
+        if ("divider" in item) return item
+        if (item.action === "add-term") return item
         return { ...item, disabled: true }
       })
     }
     return items
+  }
+
+  const renderParagraph = (paragraph: string, index: number, isOppositePane: boolean) => {
+    const isSelected =
+      selectedParagraph !== null &&
+      selectedParagraph.index === index &&
+      ((isOppositePane && selectedParagraph.panel !== (isOppositePane ? "german" : "english")) ||
+        (!isOppositePane && selectedParagraph.panel === (isOppositePane ? "german" : "english")))
+
+    return (
+      <div key={index} className={`${isSelected ? "bg-blue-200" : ""}`}>
+        {paragraph}
+        {index < (isOppositePane ? germanParagraphs.length : englishParagraphs.length) - 1 && "\n\n"}
+      </div>
+    )
   }
 
   return (
@@ -270,53 +300,47 @@ export function ChapterEditor({ chapterId }: ChapterEditorProps) {
             {isSourceLocked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
           </button>
         </div>
-        <div className="relative flex-1 min-h-0">
-          <Textarea
-            ref={englishRef}
-            value={englishText}
-            onChange={(e) => !isSourceLocked && setEnglishText(e.target.value)}
-            onDoubleClick={(e) => handleDoubleClick(e, "english")}
-            onContextMenu={(e) => handleContextMenu(e, "english")}
-            onScroll={(e) => setEnglishScroll(e.currentTarget.scrollTop)}
-            readOnly={isSourceLocked}
-            className="h-full w-full resize-none text-sm leading-relaxed font-sans border rounded-md bg-background p-3"
-          />
-          {/* Highlight overlay for corresponding paragraph */}
-          {selectedParagraph?.panel === "german" && (
-            <div
-              className="absolute inset-0 pointer-events-none overflow-hidden p-3 text-sm leading-relaxed font-sans whitespace-pre-wrap border border-transparent rounded-md"
-              style={{ transform: `translateY(-${englishScroll}px)` }}
-            >
-              {getHighlightText(englishParagraphs, selectedParagraph.index)}
+        <div className="flex-1 min-h-0 border rounded-md overflow-auto">
+          <div className="relative min-h-full">
+            {/* Background highlight overlay - in normal flow to define scroll height */}
+            <div className="p-3 text-sm leading-relaxed whitespace-pre-wrap pointer-events-none select-none">
+              {englishParagraphs.map((p, i) => renderParagraph(p, i, false))}
             </div>
-          )}
+            {/* Foreground textarea - absolute to overlay the highlights, overflow-hidden so parent controls scroll */}
+            <Textarea
+              ref={englishRef}
+              value={englishText}
+              onChange={(e) => !isSourceLocked && setEnglishText(e.target.value)}
+              onClick={handlePaneClick}
+              onDoubleClick={(e) => handleDoubleClick(e, "english")}
+              onContextMenu={(e) => handleContextMenu(e, "english")}
+              readOnly={isSourceLocked}
+              className="absolute inset-0 resize-none text-sm leading-relaxed bg-transparent p-3 border-0 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:border-input overflow-hidden"
+            />
+          </div>
         </div>
       </div>
 
       {/* German Panel */}
       <div className="flex flex-col gap-2 h-full min-h-0">
-        <div className="flex-shrink-0">
-          <h2 className="text-sm font-semibold text-foreground">German</h2>
-        </div>
-        <div className="relative flex-1 min-h-0">
-          <Textarea
-            ref={germanRef}
-            value={germanText}
-            onChange={(e) => setGermanText(e.target.value)}
-            onDoubleClick={(e) => handleDoubleClick(e, "german")}
-            onContextMenu={(e) => handleContextMenu(e, "german")}
-            onScroll={(e) => setGermanScroll(e.currentTarget.scrollTop)}
-            className="h-full w-full resize-none text-sm leading-relaxed font-sans border rounded-md bg-background p-3"
-          />
-          {/* Highlight overlay for corresponding paragraph */}
-          {selectedParagraph?.panel === "english" && (
-            <div
-              className="absolute inset-0 pointer-events-none overflow-hidden p-3 text-sm leading-relaxed font-sans whitespace-pre-wrap border border-transparent rounded-md"
-              style={{ transform: `translateY(-${germanScroll}px)` }}
-            >
-              {getHighlightText(germanParagraphs, selectedParagraph.index)}
+        <h2 className="text-sm font-semibold text-foreground flex-shrink-0">German</h2>
+        <div className="flex-1 min-h-0 border rounded-md overflow-auto">
+          <div className="relative min-h-full">
+            {/* Background highlight overlay - in normal flow to define scroll height */}
+            <div className="p-3 text-sm leading-relaxed whitespace-pre-wrap pointer-events-none select-none">
+              {germanParagraphs.map((p, i) => renderParagraph(p, i, true))}
             </div>
-          )}
+            {/* Foreground textarea - absolute to overlay the highlights, overflow-hidden so parent controls scroll */}
+            <Textarea
+              ref={germanRef}
+              value={germanText}
+              onChange={(e) => setGermanText(e.target.value)}
+              onClick={handlePaneClick}
+              onDoubleClick={(e) => handleDoubleClick(e, "german")}
+              onContextMenu={(e) => handleContextMenu(e, "german")}
+              className="absolute inset-0 resize-none text-sm leading-relaxed bg-transparent p-3 border-0 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:border-input overflow-hidden"
+            />
+          </div>
         </div>
       </div>
 
@@ -327,7 +351,7 @@ export function ChapterEditor({ chapterId }: ChapterEditorProps) {
           y={contextMenu.y}
           items={getMenuItems(contextMenu.type, contextMenu.panel)}
           onAction={handleMenuAction}
-          onClose={() => setContextMenu(null)}
+          onClose={handleMenuClose}
         />
       )}
     </div>
