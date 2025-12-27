@@ -10,6 +10,7 @@ import { useState } from "react"
 export default function AppPage() {
   const [currentChapter, setCurrentChapter] = useState(1)
   const [chapterOrder, setChapterOrder] = useState([1, 2, 3, 4, 5])
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   const handleAddChapter = () => {
     const newChapterNumber = Math.max(...chapterOrder) + 1
@@ -34,7 +35,13 @@ export default function AppPage() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      <Sidebar currentChapter={currentChapter} onChapterChange={setCurrentChapter} chapterOrder={chapterOrder} />
+      <Sidebar
+        currentChapter={currentChapter}
+        onChapterChange={setCurrentChapter}
+        chapterOrder={chapterOrder}
+        collapsed={sidebarCollapsed}
+        onCollapsedChange={setSidebarCollapsed}
+      />
       <div className="flex flex-1 flex-col">
         <Header
           currentChapter={currentChapter}

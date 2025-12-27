@@ -2,7 +2,18 @@
 
 import type React from "react"
 
-import { Home, Settings, LogOut, BookOpen, File, Upload, Trash2, FolderOpen } from "lucide-react"
+import {
+  Home,
+  Settings,
+  LogOut,
+  BookOpen,
+  File,
+  Upload,
+  Trash2,
+  FolderOpen,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useState, useRef, useEffect } from "react"
@@ -11,10 +22,14 @@ export function Sidebar({
   currentChapter,
   onChapterChange,
   chapterOrder,
+  collapsed,
+  onCollapsedChange,
 }: {
   currentChapter: number
   onChapterChange: (chapter: number) => void
   chapterOrder: number[]
+  collapsed: boolean
+  onCollapsedChange: (collapsed: boolean) => void
 }) {
   const [files, setFiles] = useState([
     { id: 1, name: "fisherman_wife_de.txt" },
@@ -72,6 +87,44 @@ export function Sidebar({
     }
   }, [isDragging])
 
+  if (collapsed) {
+    return (
+      <aside className="flex w-12 flex-col border-r border-border bg-sidebar">
+        <div className="flex h-14 items-center justify-center border-b border-sidebar-border">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0 hover:bg-sidebar-accent"
+            onClick={() => onCollapsedChange(false)}
+          >
+            <ChevronRight className="h-4 w-4 text-sidebar-foreground" />
+          </Button>
+        </div>
+
+        <div className="flex-1 flex flex-col items-center py-2 space-y-2">
+          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-sidebar-accent" title="Files">
+            <FolderOpen className="h-4 w-4 text-sidebar-foreground" />
+          </Button>
+          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-sidebar-accent" title="Chapters">
+            <BookOpen className="h-4 w-4 text-sidebar-foreground" />
+          </Button>
+        </div>
+
+        <div className="border-t border-sidebar-border p-2 space-y-1">
+          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-sidebar-accent" title="Dashboard">
+            <Home className="h-4 w-4 text-sidebar-foreground" />
+          </Button>
+          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-sidebar-accent" title="Settings">
+            <Settings className="h-4 w-4 text-sidebar-foreground" />
+          </Button>
+          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-sidebar-accent" title="Log Out">
+            <LogOut className="h-4 w-4 text-sidebar-foreground" />
+          </Button>
+        </div>
+      </aside>
+    )
+  }
+
   return (
     <aside className="flex w-52 flex-col border-r border-border bg-sidebar">
       <div className="border-b border-sidebar-border">
@@ -80,14 +133,24 @@ export function Sidebar({
             <FolderOpen className="mr-2 h-5 w-5 text-sidebar-foreground" />
             <span className="text-sm font-semibold text-sidebar-foreground">Files</span>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 w-7 p-0 hover:bg-sidebar-accent"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <Upload className="h-4 w-4 text-sidebar-foreground" />
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0 hover:bg-sidebar-accent"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <Upload className="h-4 w-4 text-sidebar-foreground" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0 hover:bg-sidebar-accent"
+              onClick={() => onCollapsedChange(true)}
+            >
+              <ChevronLeft className="h-4 w-4 text-sidebar-foreground" />
+            </Button>
+          </div>
           <input ref={fileInputRef} type="file" multiple className="hidden" onChange={handleFileUpload} />
         </div>
 
