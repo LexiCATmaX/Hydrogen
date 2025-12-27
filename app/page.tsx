@@ -224,16 +224,6 @@ export default function LoginPage() {
                 Sign up
               </Link>
             </div>
-
-            <div className="mt-6 pt-4 border-t border-dashed border-muted">
-              <button
-                type="button"
-                onClick={() => router.push("/app")}
-                className="w-full text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors"
-              >
-                Ignore (dev)
-              </button>
-            </div>
           </CardContent>
         </Card>
       </div>

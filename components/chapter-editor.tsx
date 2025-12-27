@@ -279,7 +279,7 @@ export function ChapterEditor({ chapterId }: ChapterEditorProps) {
             onContextMenu={(e) => handleContextMenu(e, "english")}
             onScroll={(e) => setEnglishScroll(e.currentTarget.scrollTop)}
             readOnly={isSourceLocked}
-            className="h-full w-full resize-none text-sm leading-relaxed font-sans border rounded-md bg-background p-3 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:border-input"
+            className="h-full w-full resize-none text-sm leading-relaxed font-sans border rounded-md bg-background p-3"
           />
           {/* Highlight overlay for corresponding paragraph */}
           {selectedParagraph?.panel === "german" && (
@@ -306,7 +306,7 @@ export function ChapterEditor({ chapterId }: ChapterEditorProps) {
             onDoubleClick={(e) => handleDoubleClick(e, "german")}
             onContextMenu={(e) => handleContextMenu(e, "german")}
             onScroll={(e) => setGermanScroll(e.currentTarget.scrollTop)}
-            className="h-full w-full resize-none text-sm leading-relaxed font-sans border rounded-md bg-background p-3 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:border-input"
+            className="h-full w-full resize-none text-sm leading-relaxed font-sans border rounded-md bg-background p-3"
           />
           {/* Highlight overlay for corresponding paragraph */}
           {selectedParagraph?.panel === "english" && (

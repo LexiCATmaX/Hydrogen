@@ -4,12 +4,32 @@ import { Sidebar } from "@/components/sidebar"
 import { ChapterEditor } from "@/components/chapter-editor"
 import { Header } from "@/components/header"
 import { TerminologyPanel } from "@/components/terminology-panel"
-import { ProjectConfigPanel } from "@/components/project-config-panel"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { createClient } from "@/lib/supabase/client"
+import { useRouter } from "next/navigation"
 
 export default function AppPage() {
   const [currentChapter, setCurrentChapter] = useState(1)
   const [chapterOrder, setChapterOrder] = useState([1, 2, 3, 4, 5])
+  const [isLoading, setIsLoading] = useState(true)
+  const router = useRouter()
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const supabase = createClient()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      if (!user) {
+        router.push("/")
+      } else {
+        setIsLoading(false)
+      }
+    }
+
+    checkAuth()
+  }, [router])
 
   const handleAddChapter = () => {
     const newChapterNumber = Math.max(...chapterOrder) + 1
@@ -32,6 +52,14 @@ export default function AppPage() {
     }
   }
 
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex h-screen overflow-hidden bg-background">
       <Sidebar currentChapter={currentChapter} onChapterChange={setCurrentChapter} chapterOrder={chapterOrder} />
@@ -44,7 +72,6 @@ export default function AppPage() {
           onAddChapter={handleAddChapter}
           onDeleteChapter={handleDeleteChapter}
         />
-        <ProjectConfigPanel />
         <main className="flex flex-1 overflow-hidden">
           <div className="flex-1 overflow-auto">
             <ChapterEditor chapterId={currentChapter} />
