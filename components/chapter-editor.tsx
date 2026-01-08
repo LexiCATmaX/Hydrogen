@@ -1,8 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useRef, useEffect } from "react"
-import { Textarea } from "@/components/ui/textarea"
+import { useState, useEffect } from "react"
 import { Lock, Unlock } from "lucide-react"
 import { ContextMenu, type MenuItem } from "./context-menu"
 
@@ -154,19 +153,13 @@ export function ChapterEditor({ chapterId }: ChapterEditorProps) {
 
   const [englishText, setEnglishText] = useState(chapter.english)
   const [germanText, setGermanText] = useState(chapter.german)
-  const [selectedParagraph, setSelectedParagraph] = useState<{ index: number; panel: "english" | "german" } | null>(
-    null,
-  )
+  const [selectedParagraph, setSelectedParagraph] = useState<number | null>(null)
   const [isSourceLocked, setIsSourceLocked] = useState(true)
   const [contextMenu, setContextMenu] = useState<{
     x: number
     y: number
     type: "paragraph" | "partial"
-    panel: "english" | "german"
   } | null>(null)
-
-  const englishRef = useRef<HTMLTextAreaElement>(null)
-  const germanRef = useRef<HTMLTextAreaElement>(null)
 
   const englishParagraphs = englishText.split("\n\n")
   const germanParagraphs = germanText.split("\n\n")
@@ -178,76 +171,38 @@ export function ChapterEditor({ chapterId }: ChapterEditorProps) {
     setSelectedParagraph(null)
   }, [chapterId])
 
-  const handlePaneClick = (e: React.MouseEvent) => {
+  const handleParagraphClick = (e: React.MouseEvent, index: number) => {
     if (e.button === 0) {
-      // Left click only
+      // Left click clears selection
       setSelectedParagraph(null)
     }
   }
 
-  const handleDoubleClick = (e: React.MouseEvent<HTMLTextAreaElement>, panel: "english" | "german") => {
-    const textarea = e.currentTarget
-    const paragraphs = panel === "english" ? englishParagraphs : germanParagraphs
-
-    // Find which paragraph was clicked
-    let charCount = 0
-    for (let i = 0; i < paragraphs.length; i++) {
-      const paragraphLength = paragraphs[i].length + 2 // +2 for \n\n
-      if (textarea.selectionStart < charCount + paragraphLength) {
-        setSelectedParagraph({ index: i, panel })
-        return
-      }
-      charCount += paragraphLength
-    }
+  const handleParagraphDoubleClick = (index: number) => {
+    setSelectedParagraph(index)
   }
 
-  const handleContextMenu = (e: React.MouseEvent<HTMLTextAreaElement>, panel: "english" | "german") => {
+  const handleParagraphContextMenu = (e: React.MouseEvent, index: number) => {
     e.preventDefault()
     e.stopPropagation()
 
-    const textarea = e.currentTarget
-    const { selectionStart, selectionEnd } = textarea
-    const paragraphs = panel === "english" ? englishParagraphs : germanParagraphs
-
-    // Find which paragraph was right-clicked
-    let charCount = 0
-    let clickedIndex = 0
-    for (let i = 0; i < paragraphs.length; i++) {
-      const paragraphLength = paragraphs[i].length + 2
-      if (selectionStart < charCount + paragraphLength) {
-        clickedIndex = i
-        break
-      }
-      charCount += paragraphLength
-    }
-
-    // If clicking on the selected paragraph (in either pane), show paragraph menu
-    if (selectedParagraph !== null && clickedIndex === selectedParagraph.index) {
+    // If clicking on the selected paragraph, show paragraph menu
+    if (selectedParagraph === index) {
       setContextMenu({
         x: e.clientX,
         y: e.clientY,
         type: "paragraph",
-        panel,
       })
       return
     }
 
-    // Otherwise check if there's a selection
-    if (selectionStart !== selectionEnd) {
-      const selectedText = textarea.value.substring(selectionStart, selectionEnd).trim()
-      const isFullParagraph = paragraphs.some((p) => p.trim() === selectedText)
-
-      if (isFullParagraph) {
-        setSelectedParagraph({ index: clickedIndex, panel })
-      }
-
-      setContextMenu({
-        x: e.clientX,
-        y: e.clientY,
-        type: isFullParagraph ? "paragraph" : "partial",
-        panel,
-      })
-    }
+    // Otherwise select the paragraph and show context menu
+    setSelectedParagraph(index)
+    setContextMenu({
+      x: e.clientX,
+      y: e.clientY,
+      type: "paragraph",
+    })
   }
 
   const handleMenuClose = () => {
@@ -259,31 +214,8 @@ export function ChapterEditor({ chapterId }: ChapterEditorProps) {
     handleMenuClose()
   }
 
-  const getMenuItems = (type: "paragraph" | "partial", panel: "english" | "german") => {
-    const items = type === "paragraph" ? paragraphMenuItems : partialMenuItems
-    if (panel === "english" && isSourceLocked) {
-      return items.map((item) => {
-        if ("divider" in item) return item
-        if (item.action === "add-term") return item
-        return { ...item, disabled: true }
-      })
-    }
-    return items
-  }
-
-  const renderParagraph = (paragraph: string, index: number, isOppositePane: boolean) => {
-    const isSelected =
-      selectedParagraph !== null &&
-      selectedParagraph.index === index &&
-      ((isOppositePane && selectedParagraph.panel !== (isOppositePane ? "german" : "english")) ||
-        (!isOppositePane && selectedParagraph.panel === (isOppositePane ? "german" : "english")))
-
-    return (
-      <div key={index} className={`${isSelected ? "bg-blue-200" : ""}`}>
-        {paragraph}
-        {index < (isOppositePane ? germanParagraphs.length : englishParagraphs.length) - 1 && "\n\n"}
-      </div>
-    )
+  const getMenuItems = () => {
+    return paragraphMenuItems
   }
 
   return (
@@ -300,23 +232,21 @@ export function ChapterEditor({ chapterId }: ChapterEditorProps) {
             {isSourceLocked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
           </button>
         </div>
-        <div className="flex-1 min-h-0 border rounded-md overflow-auto">
-          <div className="relative min-h-full">
-            {/* Background highlight overlay - in normal flow to define scroll height */}
-            <div className="p-3 text-sm leading-relaxed whitespace-pre-wrap pointer-events-none select-none">
-              {englishParagraphs.map((p, i) => renderParagraph(p, i, false))}
-            </div>
-            {/* Foreground textarea - absolute to overlay the highlights, overflow-hidden so parent controls scroll */}
-            <Textarea
-              ref={englishRef}
-              value={englishText}
-              onChange={(e) => !isSourceLocked && setEnglishText(e.target.value)}
-              onClick={handlePaneClick}
-              onDoubleClick={(e) => handleDoubleClick(e, "english")}
-              onContextMenu={(e) => handleContextMenu(e, "english")}
-              readOnly={isSourceLocked}
-              className="absolute inset-0 resize-none text-sm leading-relaxed bg-transparent p-3 border-0 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:border-input overflow-hidden"
-            />
+        <div className="flex-1 min-h-0 border rounded-md overflow-auto bg-background">
+          <div className="p-3 text-sm leading-relaxed">
+            {englishParagraphs.map((paragraph, index) => (
+              <div
+                key={index}
+                onClick={(e) => handleParagraphClick(e, index)}
+                onDoubleClick={() => handleParagraphDoubleClick(index)}
+                onContextMenu={(e) => handleParagraphContextMenu(e, index)}
+                className={`whitespace-pre-wrap cursor-text select-text ${
+                  selectedParagraph === index ? "bg-blue-200" : ""
+                } ${index < englishParagraphs.length - 1 ? "mb-4" : ""}`}
+              >
+                {paragraph}
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -324,22 +254,21 @@ export function ChapterEditor({ chapterId }: ChapterEditorProps) {
       {/* German Panel */}
       <div className="flex flex-col gap-2 h-full min-h-0">
         <h2 className="text-sm font-semibold text-foreground flex-shrink-0">German</h2>
-        <div className="flex-1 min-h-0 border rounded-md overflow-auto">
-          <div className="relative min-h-full">
-            {/* Background highlight overlay - in normal flow to define scroll height */}
-            <div className="p-3 text-sm leading-relaxed whitespace-pre-wrap pointer-events-none select-none">
-              {germanParagraphs.map((p, i) => renderParagraph(p, i, true))}
-            </div>
-            {/* Foreground textarea - absolute to overlay the highlights, overflow-hidden so parent controls scroll */}
-            <Textarea
-              ref={germanRef}
-              value={germanText}
-              onChange={(e) => setGermanText(e.target.value)}
-              onClick={handlePaneClick}
-              onDoubleClick={(e) => handleDoubleClick(e, "german")}
-              onContextMenu={(e) => handleContextMenu(e, "german")}
-              className="absolute inset-0 resize-none text-sm leading-relaxed bg-transparent p-3 border-0 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:border-input overflow-hidden"
-            />
+        <div className="flex-1 min-h-0 border rounded-md overflow-auto bg-background">
+          <div className="p-3 text-sm leading-relaxed">
+            {germanParagraphs.map((paragraph, index) => (
+              <div
+                key={index}
+                onClick={(e) => handleParagraphClick(e, index)}
+                onDoubleClick={() => handleParagraphDoubleClick(index)}
+                onContextMenu={(e) => handleParagraphContextMenu(e, index)}
+                className={`whitespace-pre-wrap cursor-text select-text ${
+                  selectedParagraph === index ? "bg-blue-200" : ""
+                } ${index < germanParagraphs.length - 1 ? "mb-4" : ""}`}
+              >
+                {paragraph}
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -349,7 +278,7 @@ export function ChapterEditor({ chapterId }: ChapterEditorProps) {
         <ContextMenu
           x={contextMenu.x}
           y={contextMenu.y}
-          items={getMenuItems(contextMenu.type, contextMenu.panel)}
+          items={getMenuItems()}
           onAction={handleMenuAction}
           onClose={handleMenuClose}
         />
