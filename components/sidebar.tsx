@@ -19,15 +19,15 @@ import { cn } from "@/lib/utils"
 import { useState, useRef, useEffect } from "react"
 
 export function Sidebar({
-  currentChapter,
-  onChapterChange,
-  chapterOrder,
+  currentSection,
+  onSectionChange,
+  sectionOrder,
   collapsed,
   onCollapsedChange,
 }: {
-  currentChapter: number
-  onChapterChange: (chapter: number) => void
-  chapterOrder: number[]
+  currentSection: number
+  onSectionChange: (section: number) => void
+  sectionOrder: number[]
   collapsed: boolean
   onCollapsedChange: (collapsed: boolean) => void
 }) {
@@ -105,7 +105,7 @@ export function Sidebar({
           <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-sidebar-accent" title="Files">
             <FolderOpen className="h-4 w-4 text-sidebar-foreground" />
           </Button>
-          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-sidebar-accent" title="Chapters">
+          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-sidebar-accent" title="Sections">
             <BookOpen className="h-4 w-4 text-sidebar-foreground" />
           </Button>
         </div>
@@ -186,22 +186,22 @@ export function Sidebar({
       <div className="flex-1 flex flex-col min-h-0">
         <div className="flex h-14 items-center border-b border-sidebar-border px-4">
           <BookOpen className="mr-2 h-5 w-5 text-sidebar-foreground" />
-          <span className="text-sm font-semibold text-sidebar-foreground">Chapters</span>
+          <span className="text-sm font-semibold text-sidebar-foreground">Sections</span>
         </div>
 
         <nav className="flex-1 overflow-y-auto space-y-1 p-2">
-          {chapterOrder.map((chapterId) => (
+          {sectionOrder.map((sectionId) => (
             <button
-              key={chapterId}
-              onClick={() => onChapterChange(chapterId)}
+              key={sectionId}
+              onClick={() => onSectionChange(sectionId)}
               className={cn(
                 "w-full rounded-md px-3 py-2 text-left text-sm font-medium transition-colors",
-                currentChapter === chapterId
+                currentSection === sectionId
                   ? "bg-sidebar-primary text-sidebar-primary-foreground"
                   : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
               )}
             >
-              Chapter {chapterId}
+              Section {sectionId}
             </button>
           ))}
         </nav>

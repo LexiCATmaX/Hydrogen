@@ -9,27 +9,27 @@ import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 
 export function Header({
-  currentChapter,
-  onChapterChange,
-  chapterOrder,
-  onChapterOrderChange,
-  onAddChapter,
-  onDeleteChapter,
+  currentSection,
+  onSectionChange,
+  sectionOrder,
+  onSectionOrderChange,
+  onAddSection,
+  onDeleteSection,
 }: {
-  currentChapter: number
-  onChapterChange: (chapter: number) => void
-  chapterOrder: number[]
-  onChapterOrderChange: (order: number[]) => void
-  onAddChapter: () => void
-  onDeleteChapter: (chapter: number) => void
+  currentSection: number
+  onSectionChange: (section: number) => void
+  sectionOrder: number[]
+  onSectionOrderChange: (order: number[]) => void
+  onAddSection: () => void
+  onDeleteSection: (section: number) => void
 }) {
   const [openMenu, setOpenMenu] = useState<string | null>(null)
-  const [showAddChapter, setShowAddChapter] = useState(false)
-  const [showDeleteChapter, setShowDeleteChapter] = useState(false)
-  const [showReorderChapters, setShowReorderChapters] = useState(false)
-  const [reorderedChapters, setReorderedChapters] = useState<number[]>([])
+  const [showAddSection, setShowAddSection] = useState(false)
+  const [showDeleteSection, setShowDeleteSection] = useState(false)
+  const [showReorderSections, setShowReorderSections] = useState(false)
+  const [reorderedSections, setReorderedSections] = useState<number[]>([])
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
-  const [newChapterName, setNewChapterName] = useState("")
+  const [newSectionName, setNewSectionName] = useState("")
   const [showUserMenu, setShowUserMenu] = useState(false)
   const router = useRouter()
   const supabase = createClient()
@@ -39,43 +39,43 @@ export function Header({
     router.push("/auth/login")
   }
 
-  const handlePreviousChapter = () => {
-    if (currentChapter > 1) {
-      onChapterChange(currentChapter - 1)
+  const handlePreviousSection = () => {
+    if (currentSection > 1) {
+      onSectionChange(currentSection - 1)
     }
   }
 
-  const handleNextChapter = () => {
-    if (currentChapter < chapterOrder.length) {
-      onChapterChange(currentChapter + 1)
+  const handleNextSection = () => {
+    if (currentSection < sectionOrder.length) {
+      onSectionChange(currentSection + 1)
     }
   }
 
-  const handleAddChapterClick = () => {
-    setShowAddChapter(true)
+  const handleAddSectionClick = () => {
+    setShowAddSection(true)
     setOpenMenu(null)
-    setNewChapterName("")
+    setNewSectionName("")
   }
 
-  const handleDeleteChapterClick = () => {
-    setShowDeleteChapter(true)
+  const handleDeleteSectionClick = () => {
+    setShowDeleteSection(true)
     setOpenMenu(null)
   }
 
-  const handleConfirmAddChapter = () => {
-    onAddChapter()
-    setShowAddChapter(false)
-    setNewChapterName("")
+  const handleConfirmAddSection = () => {
+    onAddSection()
+    setShowAddSection(false)
+    setNewSectionName("")
   }
 
-  const handleConfirmDeleteChapter = () => {
-    onDeleteChapter(currentChapter)
-    setShowDeleteChapter(false)
+  const handleConfirmDeleteSection = () => {
+    onDeleteSection(currentSection)
+    setShowDeleteSection(false)
   }
 
-  const handleReorderChapters = () => {
-    setReorderedChapters([...chapterOrder])
-    setShowReorderChapters(true)
+  const handleReorderSections = () => {
+    setReorderedSections([...sectionOrder])
+    setShowReorderSections(true)
     setOpenMenu(null)
   }
 
@@ -87,12 +87,12 @@ export function Header({
     e.preventDefault()
     if (draggedIndex === null || draggedIndex === index) return
 
-    const newOrder = [...reorderedChapters]
+    const newOrder = [...reorderedSections]
     const draggedItem = newOrder[draggedIndex]
     newOrder.splice(draggedIndex, 1)
     newOrder.splice(index, 0, draggedItem)
 
-    setReorderedChapters(newOrder)
+    setReorderedSections(newOrder)
     setDraggedIndex(index)
   }
 
@@ -101,8 +101,8 @@ export function Header({
   }
 
   const handleSaveOrder = () => {
-    onChapterOrderChange(reorderedChapters)
-    setShowReorderChapters(false)
+    onSectionOrderChange(reorderedSections)
+    setShowReorderSections(false)
   }
 
   const menus = {
@@ -129,13 +129,13 @@ export function Header({
       { label: "Find...", shortcut: "⌘F" },
       { label: "Replace...", shortcut: "⌘R" },
     ],
-    Chapters: [
-      { label: "Previous Chapter", shortcut: "⌘[", action: handlePreviousChapter },
-      { label: "Next Chapter", shortcut: "⌘]", action: handleNextChapter },
+    Sections: [
+      { label: "Previous Section", shortcut: "⌘[", action: handlePreviousSection },
+      { label: "Next Section", shortcut: "⌘]", action: handleNextSection },
       { separator: true },
-      { label: "Add New Chapter...", action: handleAddChapterClick },
-      { label: "Delete Chapter...", action: handleDeleteChapterClick },
-      { label: "Reorder Chapters...", action: handleReorderChapters },
+      { label: "Add New Section...", action: handleAddSectionClick },
+      { label: "Delete Section...", action: handleDeleteSectionClick },
+      { label: "Reorder Sections...", action: handleReorderSections },
     ],
     Settings: [
       { label: "Translation Settings..." },
@@ -153,7 +153,7 @@ export function Header({
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground">Editing</span>
-            <span className="text-sm font-semibold text-foreground">Chapter {currentChapter}</span>
+            <span className="text-sm font-semibold text-foreground">Section {currentSection}</span>
           </div>
           <div className="h-4 w-px bg-border" />
           <nav className="flex gap-1">
@@ -236,26 +236,26 @@ export function Header({
         </div>
       </header>
 
-      {showAddChapter && (
+      {showAddSection && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-          onClick={() => setShowAddChapter(false)}
+          onClick={() => setShowAddSection(false)}
         >
           <div
             className="w-96 rounded-lg border border-border bg-card p-6 shadow-lg"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="mb-4 text-lg font-semibold">Add New Chapter</h2>
+            <h2 className="mb-4 text-lg font-semibold">Add New Section</h2>
             <div className="mb-4">
-              <label className="mb-2 block text-sm text-muted-foreground">Chapter Name</label>
+              <label className="mb-2 block text-sm text-muted-foreground">Section Name</label>
               <input
                 type="text"
-                placeholder="Enter chapter name..."
-                value={newChapterName}
-                onChange={(e) => setNewChapterName(e.target.value)}
+                placeholder="Enter section name..."
+                value={newSectionName}
+                onChange={(e) => setNewSectionName(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
-                    handleConfirmAddChapter()
+                    handleConfirmAddSection()
                   }
                 }}
                 className="w-full rounded border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
@@ -263,56 +263,56 @@ export function Header({
               />
             </div>
             <div className="flex justify-end gap-2">
-              <Button variant="outline" size="sm" onClick={() => setShowAddChapter(false)}>
+              <Button variant="outline" size="sm" onClick={() => setShowAddSection(false)}>
                 Cancel
               </Button>
-              <Button variant="default" size="sm" onClick={handleConfirmAddChapter}>
-                Add Chapter
+              <Button variant="default" size="sm" onClick={handleConfirmAddSection}>
+                Add Section
               </Button>
             </div>
           </div>
         </div>
       )}
 
-      {showDeleteChapter && (
+      {showDeleteSection && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-          onClick={() => setShowDeleteChapter(false)}
+          onClick={() => setShowDeleteSection(false)}
         >
           <div
             className="w-96 rounded-lg border border-border bg-card p-6 shadow-lg"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="mb-4 text-lg font-semibold">Delete Chapter</h2>
+            <h2 className="mb-4 text-lg font-semibold">Delete Section</h2>
             <p className="mb-4 text-sm text-muted-foreground">
-              Are you sure you want to delete Chapter {currentChapter}? This action cannot be undone.
+              Are you sure you want to delete Section {currentSection}? This action cannot be undone.
             </p>
             <div className="flex justify-end gap-2">
-              <Button variant="outline" size="sm" onClick={() => setShowDeleteChapter(false)}>
+              <Button variant="outline" size="sm" onClick={() => setShowDeleteSection(false)}>
                 Cancel
               </Button>
-              <Button variant="destructive" size="sm" onClick={handleConfirmDeleteChapter}>
-                Delete Chapter
+              <Button variant="destructive" size="sm" onClick={handleConfirmDeleteSection}>
+                Delete Section
               </Button>
             </div>
           </div>
         </div>
       )}
 
-      {showReorderChapters && (
+      {showReorderSections && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-          onClick={() => setShowReorderChapters(false)}
+          onClick={() => setShowReorderSections(false)}
         >
           <div
             className="w-96 rounded-lg border border-border bg-card p-6 shadow-lg"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="mb-4 text-lg font-semibold">Reorder Chapters</h2>
+            <h2 className="mb-4 text-lg font-semibold">Reorder Sections</h2>
             <div className="mb-4 space-y-2">
-              {reorderedChapters.map((chapter, index) => (
+              {reorderedSections.map((section, index) => (
                 <div
-                  key={chapter}
+                  key={section}
                   draggable
                   onDragStart={() => handleDragStart(index)}
                   onDragOver={(e) => handleDragOver(e, index)}
@@ -326,12 +326,12 @@ export function Header({
                     <div className="h-0.5 w-3 bg-muted-foreground"></div>
                     <div className="h-0.5 w-3 bg-muted-foreground"></div>
                   </div>
-                  <span className="text-sm">Chapter {chapter}</span>
+                  <span className="text-sm">Section {section}</span>
                 </div>
               ))}
             </div>
             <div className="flex justify-end gap-2">
-              <Button variant="outline" size="sm" onClick={() => setShowReorderChapters(false)}>
+              <Button variant="outline" size="sm" onClick={() => setShowReorderSections(false)}>
                 Cancel
               </Button>
               <Button variant="default" size="sm" onClick={handleSaveOrder}>

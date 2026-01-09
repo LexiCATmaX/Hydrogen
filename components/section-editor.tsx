@@ -5,13 +5,13 @@ import { useState, useEffect } from "react"
 import { Lock, Unlock } from "lucide-react"
 import { ContextMenu, type MenuItem } from "./context-menu"
 
-interface ChapterEditorProps {
-  chapterId: number
+interface SectionEditorProps {
+  sectionId: number
 }
 
-const chaptersData: Record<number, { title: string; english: string; german: string }> = {
+const sectionsData: Record<number, { title: string; english: string; german: string }> = {
   1: {
-    title: "Chapter 1",
+    title: "Section 1",
     english: `There was once a fisherman who lived with his wife in a pigsty, close by the seaside. The fisherman used to go out all day long a-fishing; and one day, as he sat on the shore with his rod, looking at the sparkling waves and watching his line, all on a sudden his float was dragged away deep into the water: and in drawing it up he pulled out a great fish.
 
 But the fish said, 'Pray let me live! I am not a real fish; I am an enchanted prince: put me in the water again, and let me go!' 'Oh, ho!' said the man, 'you need not make so many words about the matter; I will have nothing to do with a fish that can talk: so swim away, sir, as soon as you please!'
@@ -24,7 +24,7 @@ Aber der Fisch sagte: „Bitte lass mich leben! Ich bin kein echter Fisch; ich b
 Dann setzte er ihn wieder ins Wasser, und der Fisch schoss geradewegs zum Grund hinunter und hinterließ einen langen Blutstreifen auf der Welle.`,
   },
   2: {
-    title: "Chapter 2",
+    title: "Section 2",
     english: `When the fisherman went home to his wife in the pigsty, he told her how he had caught a great fish, and how it had told him it was an enchanted prince, and how, on hearing it speak, he had let it go again. 'Did not you ask it for anything?' said the wife, 'we live very wretchedly here, in this nasty dirty pigsty; do go back and tell the fish we want a snug little cottage.'
 
 The fisherman did not much like the business: however, he went to the seaside; and when he came back there the water looked all yellow and green. And he stood at the water's edge, and said:
@@ -45,14 +45,14 @@ Will ihren eigenen Willen haben,
 Und hat mich geschickt, dich um eine Gunst zu bitten!"`,
   },
   3: {
-    title: "Chapter 3",
+    title: "Section 3",
     english: `Then the fish came swimming to him, and said, 'Well, what is her will? What does your wife want?' 'Ah!' said the fisherman, 'she says that when I had caught you, I ought to have asked you for something before I let you go; she does not like living any longer in the pigsty, and wants a snug little cottage.' 'Go home, then,' said the fish; 'she is in the cottage already.'
 
 So the man went home, and saw his wife standing at the door of a nice trim little cottage. 'Come in, come in!' said she; 'is not this much better than the filthy pigsty we had?' And there was a parlour, and a bedchamber, and a kitchen; and behind the cottage there was a little garden, planted with all sorts of flowers and fruits; and there was a courtyard behind, full of ducks and chickens.`,
     german: `Dann kam der Fisch zu ihm geschwommen und sagte: „Nun, was ist ihr Wille? Was will deine Frau?" „Ach!" sagte der Fischer, „sie sagt, als ich dich gefangen hatte, hätte ich dich um etwas bitten sollen, bevor ich dich gehen ließ; sie mag es nicht mehr, im Schweinestall zu leben, und will ein gemütliches kleines Häuschen." „Geh dann nach Hause," sagte der Fisch; „sie steht schon im Häuschen."`,
   },
   4: {
-    title: "Chapter 4",
+    title: "Section 4",
     english: `'Ah!' said the fisherman, 'how happily we shall live now!' 'We will try to do so, at least,' said his wife. Everything went right for a week or two, and then Dame Ilsabill said, 'Husband, there is not near room enough for us in this cottage; the courtyard and the garden are a great deal too small; I should like to have a large stone castle to live in: go to the fish again and tell him to give us a castle.'
 
 'Wife,' said the fisherman, 'I don't like to go to him again, for perhaps he will be angry; we ought to be easy with this pretty cottage to live in.' 'Nonsense!' said the wife; 'he will do it very willingly, I know; go along and try!'`,
@@ -61,7 +61,7 @@ So the man went home, and saw his wife standing at the door of a nice trim littl
 „Frau," sagte der Fischer, „ich mag nicht wieder zu ihm gehen, denn vielleicht wird er böse sein; wir sollten mit diesem hübschen Häuschen zum Leben zufrieden sein." „Unsinn!" sagte die Frau; „er wird es sehr gerne tun, das weiß ich; geh los und versuch es!"`,
   },
   5: {
-    title: "Chapter 5",
+    title: "Section 5",
     english: `The fisherman went, but his heart was very heavy: and when he came to the sea, it looked blue and gloomy, though it was very calm; and he went close to the edge of the waves, and said:
 
 'O man of the sea!
@@ -148,11 +148,11 @@ const partialMenuItems: MenuItem[] = [
   { label: "Delete and clean-up", action: "delete-cleanup" },
 ]
 
-export function ChapterEditor({ chapterId }: ChapterEditorProps) {
-  const chapter = chaptersData[chapterId] || chaptersData[1]
+export function SectionEditor({ sectionId }: SectionEditorProps) {
+  const section = sectionsData[sectionId] || sectionsData[1]
 
-  const [englishText, setEnglishText] = useState(chapter.english)
-  const [germanText, setGermanText] = useState(chapter.german)
+  const [englishText, setEnglishText] = useState(section.english)
+  const [germanText, setGermanText] = useState(section.german)
   const [selectedParagraph, setSelectedParagraph] = useState<number | null>(null)
   const [isSourceLocked, setIsSourceLocked] = useState(true)
   const [contextMenu, setContextMenu] = useState<{
@@ -165,11 +165,11 @@ export function ChapterEditor({ chapterId }: ChapterEditorProps) {
   const germanParagraphs = germanText.split("\n\n")
 
   useEffect(() => {
-    const newChapter = chaptersData[chapterId] || chaptersData[1]
-    setEnglishText(newChapter.english)
-    setGermanText(newChapter.german)
+    const newSection = sectionsData[sectionId] || sectionsData[1]
+    setEnglishText(newSection.english)
+    setGermanText(newSection.german)
     setSelectedParagraph(null)
-  }, [chapterId])
+  }, [sectionId])
 
   const handleParagraphClick = (e: React.MouseEvent, index: number) => {
     if (e.button === 0) {
