@@ -9,7 +9,6 @@ import { Save, Printer, Download, LogOut, User, Menu, PanelRight, X } from "luci
 import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 
 export function Header({
   currentSection,
@@ -44,10 +43,10 @@ export function Header({
   const [loginEmail, setLoginEmail] = useState("")
   const [loginPassword, setLoginPassword] = useState("")
   const [loginError, setLoginError] = useState<string | null>(null)
-  const router = useRouter()
-  const supabase = createClient()
 
   useEffect(() => {
+    const supabase = createClient()
+
     const checkUser = async () => {
       const {
         data: { user },
@@ -63,7 +62,7 @@ export function Header({
     })
 
     return () => subscription.unsubscribe()
-  }, [supabase.auth])
+  }, [])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -71,6 +70,7 @@ export function Header({
     setLoginError(null)
 
     try {
+      const supabase = createClient()
       const { error } = await supabase.auth.signInWithPassword({
         email: loginEmail,
         password: loginPassword,
@@ -89,6 +89,7 @@ export function Header({
   const handleOAuthLogin = async (provider: "google" | "apple") => {
     setIsLoading(true)
     try {
+      const supabase = createClient()
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
@@ -104,9 +105,10 @@ export function Header({
   }
 
   const handleLogout = async () => {
+    const supabase = createClient()
     await supabase.auth.signOut()
-    router.push("/auth/login")
     setUser(null)
+    setShowUserMenu(false)
   }
 
   const handlePreviousSection = () => {
