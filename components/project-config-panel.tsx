@@ -516,7 +516,7 @@ export function ProjectConfigPanel() {
   ]
 
   return (
-    <div className="flex items-center gap-2 border-b border-border bg-muted/30 px-4 py-2 flex-wrap">
+    <div className="flex items-center gap-2 border-b border-border bg-muted/30 px-4 py-2 flex-wrap overflow-x-auto">
       {/* Document Type Selector */}
       <div className="flex items-center gap-2">
         <label className="text-xs font-medium text-foreground whitespace-nowrap">Type</label>
@@ -536,17 +536,17 @@ export function ProjectConfigPanel() {
         </div>
       </div>
 
-      <Divider />
+      <div className="h-6 w-px bg-border mx-2 hidden sm:block" />
 
-      {/* Context Options (Dynamic) */}
-      <div className="flex items-center gap-3 flex-wrap">{renderContextOptions()}</div>
+      {/* Context Options - hide on very small screens */}
+      <div className="hidden sm:flex items-center gap-3 flex-wrap">{renderContextOptions()}</div>
 
-      <Divider />
+      <div className="h-6 w-px bg-border mx-2 hidden md:block" />
 
-      {/* AI Constraints (Always Visible) */}
-      <div className="flex items-center gap-3">
+      {/* AI Constraints - simplified on mobile */}
+      <div className="flex items-center gap-2 md:gap-3">
         <Toggle
-          label="Add Content"
+          label="Add"
           checked={config.allowContentAddition}
           onChange={(v) => updateConfig("allowContentAddition", v)}
           tooltip="Allow AI to add content not in source"
@@ -557,28 +557,30 @@ export function ProjectConfigPanel() {
           onChange={(v) => updateConfig("allowStructuralChanges", v)}
           tooltip="Allow AI to change document structure"
         />
-        <Toggle
-          label="Show Diff"
-          checked={config.showDiffAutomatically}
-          onChange={(v) => updateConfig("showDiffAutomatically", v)}
-          tooltip="Automatically show changes"
-        />
+        <div className="hidden md:block">
+          <Toggle
+            label="Show Diff"
+            checked={config.showDiffAutomatically}
+            onChange={(v) => updateConfig("showDiffAutomatically", v)}
+            tooltip="Automatically show changes"
+          />
+        </div>
       </div>
 
-      <Divider />
+      <div className="h-6 w-px bg-border mx-2 hidden lg:block" />
 
-      {/* Status Summary */}
-      <div className="ml-auto flex items-center gap-3">
-        <span className="text-xs text-muted-foreground whitespace-nowrap">{getStatusSummary()}</span>
+      {/* Status Summary - hidden on mobile */}
+      <div className="ml-auto flex items-center gap-2 md:gap-3">
+        <span className="text-xs text-muted-foreground whitespace-nowrap hidden lg:inline">{getStatusSummary()}</span>
 
         <Button variant="outline" size="sm" onClick={() => setAdvancedOpen(true)} className="h-7 text-xs gap-1.5">
           <Settings2 className="h-3.5 w-3.5" />
-          Advanced
+          <span className="hidden sm:inline">Advanced</span>
         </Button>
       </div>
 
       <Dialog open={advancedOpen} onOpenChange={setAdvancedOpen}>
-        <DialogContent className="max-w-lg max-h-[80vh] flex flex-col">
+        <DialogContent className="max-w-lg w-[95vw] md:w-full max-h-[90vh] md:max-h-[80vh] flex flex-col">
           <DialogHeader className="flex-shrink-0">
             <DialogTitle className="text-lg font-semibold">Project Context Settings</DialogTitle>
           </DialogHeader>

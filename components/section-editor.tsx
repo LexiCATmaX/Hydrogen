@@ -173,7 +173,6 @@ export function SectionEditor({ sectionId }: SectionEditorProps) {
 
   const handleParagraphClick = (e: React.MouseEvent, index: number) => {
     if (e.button === 0) {
-      // Left click clears selection
       setSelectedParagraph(null)
     }
   }
@@ -186,7 +185,6 @@ export function SectionEditor({ sectionId }: SectionEditorProps) {
     e.preventDefault()
     e.stopPropagation()
 
-    // If clicking on the selected paragraph, show paragraph menu
     if (selectedParagraph === index) {
       setContextMenu({
         x: e.clientX,
@@ -196,13 +194,21 @@ export function SectionEditor({ sectionId }: SectionEditorProps) {
       return
     }
 
-    // Otherwise select the paragraph and show context menu
     setSelectedParagraph(index)
     setContextMenu({
       x: e.clientX,
       y: e.clientY,
       type: "paragraph",
     })
+  }
+
+  const handleTouchStart = (index: number) => {
+    const timeout = setTimeout(() => {
+      setSelectedParagraph(index)
+      // Note: Touch devices don't have contextmenu in the same way
+      // This just selects the paragraph on long press
+    }, 500)
+    return () => clearTimeout(timeout)
   }
 
   const handleMenuClose = () => {
@@ -219,9 +225,9 @@ export function SectionEditor({ sectionId }: SectionEditorProps) {
   }
 
   return (
-    <div className="flex-1 h-full p-4 grid grid-cols-2 gap-4">
+    <div className="flex-1 h-full p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
       {/* English Panel */}
-      <div className="flex flex-col gap-2 h-full min-h-0">
+      <div className="flex flex-col gap-2 h-[45vh] md:h-full min-h-0">
         <div className="flex items-center gap-2 flex-shrink-0">
           <h2 className="text-sm font-semibold text-foreground">English</h2>
           <button
@@ -240,7 +246,8 @@ export function SectionEditor({ sectionId }: SectionEditorProps) {
                 onClick={(e) => handleParagraphClick(e, index)}
                 onDoubleClick={() => handleParagraphDoubleClick(index)}
                 onContextMenu={(e) => handleParagraphContextMenu(e, index)}
-                className={`whitespace-pre-wrap cursor-text select-text ${
+                onTouchStart={handleTouchStart(index)}
+                className={`whitespace-pre-wrap cursor-text select-text touch-manipulation ${
                   selectedParagraph === index ? "bg-blue-200" : ""
                 } ${index < englishParagraphs.length - 1 ? "mb-4" : ""}`}
               >
@@ -252,7 +259,7 @@ export function SectionEditor({ sectionId }: SectionEditorProps) {
       </div>
 
       {/* German Panel */}
-      <div className="flex flex-col gap-2 h-full min-h-0">
+      <div className="flex flex-col gap-2 h-[45vh] md:h-full min-h-0">
         <h2 className="text-sm font-semibold text-foreground flex-shrink-0">German</h2>
         <div className="flex-1 min-h-0 border rounded-md overflow-auto bg-background">
           <div className="p-3 text-sm leading-relaxed">
@@ -262,7 +269,8 @@ export function SectionEditor({ sectionId }: SectionEditorProps) {
                 onClick={(e) => handleParagraphClick(e, index)}
                 onDoubleClick={() => handleParagraphDoubleClick(index)}
                 onContextMenu={(e) => handleParagraphContextMenu(e, index)}
-                className={`whitespace-pre-wrap cursor-text select-text ${
+                onTouchStart={handleTouchStart(index)}
+                className={`whitespace-pre-wrap cursor-text select-text touch-manipulation ${
                   selectedParagraph === index ? "bg-blue-200" : ""
                 } ${index < germanParagraphs.length - 1 ? "mb-4" : ""}`}
               >

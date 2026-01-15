@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label"
 import { ChevronRight, Plus, Check, FileText, X, Edit } from "lucide-react"
 import { useState } from "react"
 
+// ... existing interfaces and data ...
+
 interface TermEntry {
   source: string
   target: string
@@ -37,7 +39,7 @@ const pipelineSteps: PipelineStep[] = [
   { label: "Ready to Export", status: "in-progress" },
 ]
 
-export function TerminologyPanel() {
+export function TerminologyPanel({ onClose }: { onClose?: () => void }) {
   const [terms, setTerms] = useState(initialTerms)
   const [isExpanded, setIsExpanded] = useState(true)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
@@ -70,7 +72,7 @@ export function TerminologyPanel() {
   return (
     <>
       <aside
-        className={`flex flex-col border-l border-border bg-card transition-all duration-300 ${
+        className={`flex flex-col border-l border-border bg-card transition-all duration-300 h-full ${
           isExpanded ? "w-80" : "w-12"
         }`}
       >
@@ -78,11 +80,24 @@ export function TerminologyPanel() {
           <>
             <div className="flex items-center justify-between border-b border-border p-4">
               <h3 className="text-sm font-semibold text-foreground">Terminology Constraints</h3>
-              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setIsExpanded(false)}>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+              <div className="flex items-center gap-1">
+                {onClose && (
+                  <Button variant="ghost" size="icon" className="h-6 w-6 md:hidden" onClick={onClose}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 hidden md:flex"
+                  onClick={() => setIsExpanded(false)}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
 
+            {/* ... rest of the component stays the same ... */}
             <div className="flex-1 overflow-auto border-b border-border">
               <div className="space-y-1 p-3">
                 {terms.map((term, index) => (
@@ -128,7 +143,7 @@ export function TerminologyPanel() {
               </Button>
             </div>
 
-            <div className="space-y-2 border-t border-border pt-4">
+            <div className="space-y-2 border-t border-border p-4">
               <div className="flex items-center justify-between text-xs">
                 <span className="text-muted-foreground">CI Status: Build #1023</span>
                 <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/20">
@@ -147,13 +162,13 @@ export function TerminologyPanel() {
       </aside>
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] md:max-h-[80vh]">
           <DialogHeader>
             <DialogTitle>Edit Terminology Constraints</DialogTitle>
           </DialogHeader>
-          <div className="max-h-[400px] space-y-3 overflow-auto py-4">
+          <div className="max-h-[50vh] md:max-h-[400px] space-y-3 overflow-auto py-4">
             {editingTerms.map((term, index) => (
-              <div key={index} className="flex items-end gap-3">
+              <div key={index} className="flex flex-col sm:flex-row items-stretch sm:items-end gap-2 sm:gap-3">
                 <div className="flex-1 space-y-1.5">
                   <Label htmlFor={`source-${index}`} className="text-xs">
                     Source Term
@@ -176,7 +191,12 @@ export function TerminologyPanel() {
                     placeholder="German translation"
                   />
                 </div>
-                <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => handleRemoveTerm(index)}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9 self-end"
+                  onClick={() => handleRemoveTerm(index)}
+                >
                   <X className="h-4 w-4" />
                 </Button>
               </div>
@@ -186,11 +206,13 @@ export function TerminologyPanel() {
             <Plus className="mr-2 h-4 w-4" />
             Add Term
           </Button>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="w-full sm:w-auto">
               Cancel
             </Button>
-            <Button onClick={handleSaveTerms}>Save Changes</Button>
+            <Button onClick={handleSaveTerms} className="w-full sm:w-auto">
+              Save Changes
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
