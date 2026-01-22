@@ -67,7 +67,7 @@ export function Sidebar({
       const sidebar = document.querySelector("aside")
       if (sidebar) {
         const rect = sidebar.getBoundingClientRect()
-        const newHeight = e.clientY - rect.top - 56 // Subtract header height
+        const newHeight = e.clientY - rect.top - 56
         if (newHeight >= 100 && newHeight <= 500) {
           setFilesPaneHeight(newHeight)
         }
@@ -89,7 +89,7 @@ export function Sidebar({
 
   if (collapsed) {
     return (
-      <aside className="flex w-12 flex-col border-r border-border bg-sidebar">
+      <aside className="hidden md:flex w-12 flex-col border-r border-border bg-sidebar">
         <div className="flex h-14 items-center justify-center border-b border-sidebar-border">
           <Button
             variant="ghost"
@@ -126,7 +126,7 @@ export function Sidebar({
   }
 
   return (
-    <aside className="flex w-52 flex-col border-r border-border bg-sidebar">
+    <aside className="flex w-full md:w-52 flex-col border-r border-border bg-sidebar h-full">
       <div className="border-b border-sidebar-border">
         <div className="flex h-14 items-center justify-between border-b border-sidebar-border px-4">
           <div className="flex items-center">
@@ -145,7 +145,7 @@ export function Sidebar({
             <Button
               variant="ghost"
               size="sm"
-              className="h-7 w-7 p-0 hover:bg-sidebar-accent"
+              className="h-7 w-7 p-0 hover:bg-sidebar-accent hidden md:flex"
               onClick={() => onCollapsedChange(true)}
             >
               <ChevronLeft className="h-4 w-4 text-sidebar-foreground" />
@@ -176,7 +176,7 @@ export function Sidebar({
 
         <div
           className={cn(
-            "h-1 cursor-row-resize hover:bg-sidebar-primary transition-colors",
+            "h-1 cursor-row-resize hover:bg-sidebar-primary transition-colors hidden md:block",
             isDragging && "bg-sidebar-primary",
           )}
           onMouseDown={handleMouseDown}

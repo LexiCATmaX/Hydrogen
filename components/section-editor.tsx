@@ -225,9 +225,9 @@ export function SectionEditor({ sectionId }: SectionEditorProps) {
   }
 
   return (
-    <div className="flex-1 h-full p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="flex-1 h-full p-2 md:p-4 grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4">
       {/* English Panel */}
-      <div className="flex flex-col gap-2 h-[45vh] md:h-full min-h-0">
+      <div className="flex flex-col gap-2 flex-1 min-h-[200px] md:min-h-0 md:h-full">
         <div className="flex items-center gap-2 flex-shrink-0">
           <h2 className="text-sm font-semibold text-foreground">English</h2>
           <button
@@ -247,7 +247,7 @@ export function SectionEditor({ sectionId }: SectionEditorProps) {
                 onDoubleClick={() => handleParagraphDoubleClick(index)}
                 onContextMenu={(e) => handleParagraphContextMenu(e, index)}
                 onTouchStart={handleTouchStart(index)}
-                className={`whitespace-pre-wrap cursor-text select-text touch-manipulation ${
+                className={`whitespace-pre-wrap cursor-text select-text ${
                   selectedParagraph === index ? "bg-blue-200" : ""
                 } ${index < englishParagraphs.length - 1 ? "mb-4" : ""}`}
               >
@@ -259,7 +259,7 @@ export function SectionEditor({ sectionId }: SectionEditorProps) {
       </div>
 
       {/* German Panel */}
-      <div className="flex flex-col gap-2 h-[45vh] md:h-full min-h-0">
+      <div className="flex flex-col gap-2 flex-1 min-h-[200px] md:min-h-0 md:h-full">
         <h2 className="text-sm font-semibold text-foreground flex-shrink-0">German</h2>
         <div className="flex-1 min-h-0 border rounded-md overflow-auto bg-background">
           <div className="p-3 text-sm leading-relaxed">
@@ -270,7 +270,7 @@ export function SectionEditor({ sectionId }: SectionEditorProps) {
                 onDoubleClick={() => handleParagraphDoubleClick(index)}
                 onContextMenu={(e) => handleParagraphContextMenu(e, index)}
                 onTouchStart={handleTouchStart(index)}
-                className={`whitespace-pre-wrap cursor-text select-text touch-manipulation ${
+                className={`whitespace-pre-wrap cursor-text select-text ${
                   selectedParagraph === index ? "bg-blue-200" : ""
                 } ${index < germanParagraphs.length - 1 ? "mb-4" : ""}`}
               >

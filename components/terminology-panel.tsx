@@ -8,8 +8,6 @@ import { Label } from "@/components/ui/label"
 import { ChevronRight, Plus, Check, FileText, X, Edit } from "lucide-react"
 import { useState } from "react"
 
-// ... existing interfaces and data ...
-
 interface TermEntry {
   source: string
   target: string
@@ -72,8 +70,8 @@ export function TerminologyPanel({ onClose }: { onClose?: () => void }) {
   return (
     <>
       <aside
-        className={`flex flex-col border-l border-border bg-card transition-all duration-300 h-full ${
-          isExpanded ? "w-80" : "w-12"
+        className={`flex flex-col border-l border-border bg-card transition-all duration-300 h-full w-full md:w-64 ${
+          isExpanded ? "md:w-64" : "md:w-12"
         }`}
       >
         {isExpanded ? (
@@ -97,7 +95,6 @@ export function TerminologyPanel({ onClose }: { onClose?: () => void }) {
               </div>
             </div>
 
-            {/* ... rest of the component stays the same ... */}
             <div className="flex-1 overflow-auto border-b border-border">
               <div className="space-y-1 p-3">
                 {terms.map((term, index) => (

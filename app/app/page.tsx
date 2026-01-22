@@ -40,16 +40,13 @@ export default function AppPage() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
-      {mobileSidebarOpen && (
-        <div className="fixed inset-0 z-40 bg-black/50 md:hidden" onClick={() => setMobileSidebarOpen(false)} />
-      )}
-
+    <div className="flex h-[100dvh] overflow-hidden bg-background">
       <div
         className={`
-        fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 md:relative md:transform-none
-        ${mobileSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
-      `}
+          fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out
+          md:relative md:transform-none md:z-auto
+          ${mobileSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+        `}
       >
         <Sidebar
           currentSection={currentSection}
@@ -63,6 +60,10 @@ export default function AppPage() {
         />
       </div>
 
+      {mobileSidebarOpen && (
+        <div className="fixed inset-0 z-40 bg-black/50 md:hidden" onClick={() => setMobileSidebarOpen(false)} />
+      )}
+
       <div className="flex flex-1 flex-col min-w-0">
         <Header
           currentSection={currentSection}
@@ -74,22 +75,27 @@ export default function AppPage() {
           onMobileSidebarToggle={() => setMobileSidebarOpen(!mobileSidebarOpen)}
           onMobileTerminologyToggle={() => setMobileTerminologyOpen(!mobileTerminologyOpen)}
         />
-        <ProjectConfigPanel />
+        <div className="hidden md:block">
+          <ProjectConfigPanel />
+        </div>
         <main className="flex flex-1 overflow-hidden flex-col md:flex-row">
-          <div className="flex-1 overflow-auto">
+          <div className="flex-1 overflow-auto min-h-0">
             <SectionEditor sectionId={currentSection} />
           </div>
-          <div
-            className={`
-            fixed inset-y-0 right-0 z-50 transform transition-transform duration-300 md:relative md:transform-none
-            ${mobileTerminologyOpen ? "translate-x-0" : "translate-x-full md:translate-x-0"}
-          `}
-          >
-            <TerminologyPanel onClose={() => setMobileTerminologyOpen(false)} />
-          </div>
+
           {mobileTerminologyOpen && (
             <div className="fixed inset-0 z-40 bg-black/50 md:hidden" onClick={() => setMobileTerminologyOpen(false)} />
           )}
+
+          <div
+            className={`
+              fixed inset-y-0 right-0 z-50 w-64 transform transition-transform duration-300 ease-in-out
+              md:relative md:transform-none md:z-auto md:w-auto
+              ${mobileTerminologyOpen ? "translate-x-0" : "translate-x-full md:translate-x-0"}
+            `}
+          >
+            <TerminologyPanel onClose={() => setMobileTerminologyOpen(false)} />
+          </div>
         </main>
       </div>
     </div>
